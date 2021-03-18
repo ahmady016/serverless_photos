@@ -1,0 +1,17 @@
+{
+  "name": "serverless-photos",
+  "version": "1.0.0",
+  "description": "",
+  "main": "",
+  "devDependencies": {
+    "aws-sdk": "^2.616.0",
+    "serverless": "^1.63.0",
+    "serverless-dynamodb-local": "^0.2.39",
+    "serverless-offline": "^5.12.1"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Ahmed Hamdy",
+  "license": "ISC"
+}

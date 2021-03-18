@@ -1,0 +1,74 @@
+service: serverless-photos
+frameworkVersion: '2'
+
+custom:
+  tableName: photos
+  bucketName: serverless-photos-upload-bucket-2021
+  dynamodb:
+    stages:
+      - dev
+    start:
+      port: 7000
+      inMemory: true
+      migrate: true
+    migration:
+      dir: offline/migrations
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  profile: serverlessUser
+  lambdaHashingVersion: 20201221
+  stage: dev
+  region: us-east-1
+  environment:
+    tableName: ${self:custom.tableName}
+    bucketName: ${self:custom.bucketName}
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:*
+        - s3:*
+        - ses:*
+      Resource: '*'
+
+resources:
+  Resources:
+    DemoBucketUpload:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:custom.bucketName}
+    MyDynamoDbTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:custom.tableName}
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+
+package:
+  individually: true
+
+plugins:
+  - serverless-offline
+  - serverless-dynamodb-local
+
+functions:
+  listPhotos:
+    handler: src/listPhotos.handler
+    events:
+      - http:
+        path: /photos
+        method: GET
+        cors: true
+  addPhoto:
+    handler: src/addPhoto.handler
+    events:
+      - http:
+        path: /add-photo
+        method: POST
+        cors: true
